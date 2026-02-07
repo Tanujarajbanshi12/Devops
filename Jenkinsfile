@@ -1,30 +1,34 @@
 pipeline {
     agent any
- environment {
-    
-        IMAGE_NAME = 'html-portfolio'
-        CONTAINER_NAME = 'html-portfolio-container'
-    }
+
     stages {
 
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                checkout scm
+                git https://'github.com/Tanujarajbanshi12/Devops.git'
             }
         }
 
-        stage('Verify Files') {
+        stage('Build Docker Image') {
             steps {
-                bat 'echo Checking project files'
-                bat 'dir'
-                bat 'if not exist index.html exit 1'
+                sh 'docker compose build'
             }
         }
 
-        stage('Success') {
+        stage('Stop Old Containers') {
             steps {
-                bat 'echo HTML Portfolio CI pipeline completed'
+                sh 'docker compose down'
             }
         }
+
+       stage('Deploy with Docker Compose') {
+    steps {
+        sh '''
+        docker compose down || true
+        docker compose up -d --build
+        '''
+    }
+}
+
     }
 }
