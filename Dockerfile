@@ -1,4 +1,4 @@
 FROM nginx:alpine
-copy . /usr/share/nginx/html
+copy index.html. /usr/share/nginx/html
 
 Expose 80

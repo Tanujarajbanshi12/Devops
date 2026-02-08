@@ -1,34 +1,37 @@
 pipeline {
     agent any
 
-    stages {
+    environment {
+        IMAGE_NAME = "myapp"
+    }
 
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Tanujarajbanshi12/Devops.git'
-            }
-        }
+    stages {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker compose build'
+                bat 'docker build -t %IMAGE_NAME% .'
             }
         }
 
         stage('Stop Old Containers') {
             steps {
-                sh 'docker compose down'
+                bat 'docker compose down || exit 0'
             }
         }
 
-       stage('Deploy with Docker Compose') {
-    steps {
-        sh '''
-        docker compose down || true
-        docker compose up -d --build
-        '''
+        stage('Deploy with Docker Compose') {
+            steps {
+                bat 'docker compose up -d'
+            }
+        }
     }
-}
 
+    post {
+        success {
+            echo 'Pipeline completed successfully'
+        }
+        failure {
+            echo ' Pipeline failed'
+        }
     }
 }
